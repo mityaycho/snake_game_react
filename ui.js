@@ -1,6 +1,6 @@
 'use strict';
 const React = require('react');
-const { useState, useEffect, useContext } = require('react');
+const {useState, useEffect, useContext} = require('react');
 const PropTypes = require('prop-types');
 const {Text, Color, Box, StdinContext} = require('ink');
 const useInterval = require('./useinterval');
@@ -34,7 +34,7 @@ function getItem(x, y, snakeSegments) {
 
 	for (const segment of snakeSegments) {
 		if (segment.x === x && segment.y === y) {
-			return <Color green> . </Color>;
+			return <Color green> o </Color>;
 		}
 	}
 };
@@ -77,7 +77,7 @@ const App = () => {
 	]);
 
 	const [direction, setDirection] = useState(DIRECTION.LEFT);
-	const { stdin, setRawMode } = useContext(StdinContext);
+	const {stdin, setRawMode} = useContext(StdinContext);
 
 	useEffect(() => {
 		setRawMode(true);
@@ -86,51 +86,77 @@ const App = () => {
 			switch (value) {
 				case ARROW_UP :
 					setDirection(DIRECTION.TOP);
-				break;
+					break;
 
 				case ARROW_DOWN :
 					setDirection(DIRECTION.BOTTOM);
-				break;
+					break;
 
 				case ARROW_LEFT :
 					setDirection(DIRECTION.LEFT);
-				break;
+					break;
 
 				case ARROW_RIGHT :
 					setDirection(DIRECTION.RIGHT);
-				break;
+					break;
 			}
 		});
 	}, []);
 
 	const [head, ...tail] = snakeSegments;
 	const intersectsWithItself = tail.some(segment => segment.x === head.x && segment.y === head.y);
+	const speed = () => {
+		if (snakeSegments.length >= 5 && (snakeSegments.length < 10)) {
+			return 500;
+		}
 
-	useInterval(() => {
-		setSnakeSegments(segments => newSnakePosition(segments, direction))
-	}, intersectsWithItself ? null : 200);
+		if (snakeSegments.length >= 10 && (snakeSegments.length < 15)) {
+			return 400;
+		}
 
-	return (
-		<Box flexDirection="column" alignItems="center">
-			<Text>
-				<Color green>Snake</Color> game
-			</Text>
-			{intersectsWithItself ? (
-				<EndScreen size={FIELD_SIZE} />
-			) : (
-				<Box flexDirection="column">
-					{FIELD_ROW.map(y => (
-						<Box key={y}>
-							{FIELD_ROW.map(x => (
-								<Box key={x}> { getItem(x, y, snakeSegments) || " o "} </Box>
-							))}
-						</Box>
-					))}
-				</Box>
-			)}
-		</Box>
-	);
-};
+		if (snakeSegments.length >= 15 && (snakeSegments.length < 20)) {
+			return 300;
+		}
+
+		if (snakeSegments.length >= 20 && (snakeSegments.length < 25)) {
+			return 200;
+		}
+
+		if (snakeSegments.length >= 25 && (snakeSegments.length < 30)) {
+			return 100;
+		}
+
+		if (snakeSegments.length >= 30 && (snakeSegments.length < 35)) {
+			return 100;
+		}
+	}
+
+useInterval(() => {
+	setSnakeSegments(segments => newSnakePosition(segments, direction))
+}, intersectsWithItself ? null : speed());
+
+return (
+	<Box flexDirection="column" alignItems="center">
+		<Text>
+			<Color green>Snake</Color> game
+		</Text>
+		{intersectsWithItself ? (
+			<EndScreen size={FIELD_SIZE}/>
+		) : (
+			<Box flexDirection="column">
+				{FIELD_ROW.map(y => (
+					<Box key={y}>
+						{FIELD_ROW.map(x => (
+							<Box key={x}> {getItem(x, y, snakeSegments) || " . "} </Box>
+						))}
+					</Box>
+				))}
+			</Box>
+		)}
+	</Box>
+);
+}
+;
 
 App.propTypes = {
 	name: PropTypes.string
